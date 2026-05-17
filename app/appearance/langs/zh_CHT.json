@@ -703,6 +703,8 @@
   "resetRepo": "重置資料倉庫",
   "createSnapshot": "建立快照",
   "dataSnapshot": "資料快照",
+  "saveAs": "另存為",
+  "searchFileName": "搜尋檔案名稱",
   "copyKey": "複製密鑰字串",
   "importKey": "導入密鑰",
   "keyPlaceholder": "請在此處貼上密鑰字串",
@@ -979,6 +981,7 @@
   "toggleWin": "隱藏/顯示視窗",
   "customSort": "自訂排序",
   "collapse": "摺疊",
+  "foldRecursive": "遞歸摺疊/展開",
   "blockEmbed": "嵌入塊",
   "rowTip": "點擊 <span class='ft__on-surface'>打開菜單</span><br>拖拽 <span class='ft__on-surface'>排序</span><br>⇧點擊 <span class='ft__on-surface'>修改屬性</span>",
   "gutterTip": "點擊/⌘/ <span class='ft__on-surface'>打開菜單</span><br>⌘點擊⌥→ <span class='ft__on-surface'>聚焦</span><br>⌥點擊⌘↑ <span class='ft__on-surface'>折疊/展開</span><br>⇧點擊⌥⌘A <span class='ft__on-surface'>修改屬性</span><br>拖拽 <span class='ft__on-surface'>移動位置</span><br>⌃拖拽 <span class='ft__on-surface'>重複</span><br>⌥拖拽 <span class='ft__on-surface'>生成塊引用</span><br>⇧拖拽 <span class='ft__on-surface'>生成嵌入塊</span>",
@@ -1783,6 +1786,11 @@
     "285": "密碼不正確",
     "286": "[%s] 已經回滾完畢",
     "287": "授權碼不能只包含空格。如需停用，請直接清空輸入框",
-    "288": "（預設圖標）"
+    "288": "（預設圖標）",
+    "289": "已匯出到下載目錄",
+    "290": "匯出失敗",
+    "291": "檔案不存在或為空",
+    "292": "無法建立檔案",
+    "293": "無法寫入檔案"
   }
 }

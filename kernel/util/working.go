@@ -81,11 +81,37 @@ func coalesceToEnvVar(fromCLI *string, envVarName string) *string {
 	return fromCLI
 }
 
-func Boot() {
+func InitWorkspace(workspacePath, wdPath string) {
 	initEnvVars()
-	IncBootProgress(3, "Booting kernel...")
 	initMime()
 	initHttpClient()
+
+	if "" != wdPath {
+		WorkingDir = wdPath
+	}
+
+	Container = ContainerStd
+	if RunInContainer {
+		Container = ContainerDocker
+	}
+
+	initWorkspaceDir(workspacePath)
+	initPathDir()
+
+	AppearancePath = filepath.Join(ConfDir, "appearance")
+	if "dev" == Mode {
+		ThemesPath = filepath.Join(WorkingDir, "appearance", "themes")
+		IconsPath = filepath.Join(WorkingDir, "appearance", "icons")
+	} else {
+		ThemesPath = filepath.Join(AppearancePath, "themes")
+		IconsPath = filepath.Join(AppearancePath, "icons")
+	}
+
+	LogPath = filepath.Join(TempDir, "siyuan.log")
+}
+
+func Boot() {
+	IncBootProgress(3, "Booting kernel...")
 
 	workspacePath := flag.String("workspace", "", "dir path of the workspace, default to ~/SiYuan/")
 	wdPath := flag.String("wd", WorkingDir, "working directory of SiYuan")
@@ -104,9 +130,6 @@ func Boot() {
 	accessAuthCode = coalesceToEnvVar(accessAuthCode, "SIYUAN_ACCESS_AUTH_CODE")
 	lang = coalesceToEnvVar(lang, "SIYUAN_LANG")
 
-	if "" != *wdPath {
-		WorkingDir = *wdPath
-	}
 	if "" != *lang {
 		Lang = *lang
 	}
@@ -146,25 +169,13 @@ func Boot() {
 	UserAgent = UserAgent + " " + Container + "/" + runtime.GOOS
 	httpclient.SetUserAgent(UserAgent)
 
-	initWorkspaceDir(*workspacePath)
+	InitWorkspace(*workspacePath, *wdPath)
 
 	SSL = *ssl
-	LogPath = filepath.Join(TempDir, "siyuan.log")
 	logging.SetLogPath(LogPath)
 
 	// 工作空间仅允许被一个内核进程伺服
 	tryLockWorkspace()
-
-	AppearancePath = filepath.Join(ConfDir, "appearance")
-	if "dev" == Mode {
-		ThemesPath = filepath.Join(WorkingDir, "appearance", "themes")
-		IconsPath = filepath.Join(WorkingDir, "appearance", "icons")
-	} else {
-		ThemesPath = filepath.Join(AppearancePath, "themes")
-		IconsPath = filepath.Join(AppearancePath, "icons")
-	}
-
-	initPathDir()
 
 	bootBanner := figure.NewColorFigure("SiYuan", "isometric3", "green", true)
 	logging.LogInfof("\n" + bootBanner.String())
@@ -228,6 +239,7 @@ var (
 	RepoDir            string        // 仓库目录路径
 	HistoryDir         string        // 数据历史目录路径
 	TempDir            string        // 临时目录路径
+	QueueDir           string        // 队列目录路径
 	LogPath            string        // 配置目录下的日志文件 siyuan.log 路径
 	DBName             = "siyuan.db" // SQLite 数据库文件名
 	DBPath             string        // SQLite 数据库文件路径
@@ -303,6 +315,7 @@ func initWorkspaceDir(workspaceArg string) {
 	RepoDir = filepath.Join(WorkspaceDir, "repo")
 	HistoryDir = filepath.Join(WorkspaceDir, "history")
 	TempDir = filepath.Join(WorkspaceDir, "temp")
+	QueueDir = filepath.Join(TempDir, "queue")
 	osTmpDir := filepath.Join(TempDir, "os")
 	os.RemoveAll(osTmpDir)
 	if err := os.MkdirAll(osTmpDir, 0755); err != nil {
@@ -442,6 +455,11 @@ func initPathDir() {
 	emojis := filepath.Join(DataDir, "emojis")
 	if err := os.MkdirAll(emojis, 0755); err != nil && !os.IsExist(err) {
 		logging.LogFatalf(logging.ExitCodeInitWorkspaceErr, "create data emojis folder [%s] failed: %s", emojis, err)
+	}
+
+	queueDir := filepath.Join(TempDir, "queue")
+	if err := os.MkdirAll(queueDir, 0755); err != nil && !os.IsExist(err) {
+		logging.LogFatalf(logging.ExitCodeInitWorkspaceErr, "create queue folder [%s] failed: %s", queueDir, err)
 	}
 
 	// Support directly access `data/public/*` contents via URL link https://github.com/siyuan-note/siyuan/issues/8593

@@ -181,6 +181,7 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("POST", "/api/lute/spinBlockDOM", model.CheckAuth, spinBlockDOM) // 未测试
 	ginServer.Handle("POST", "/api/lute/html2BlockDOM", model.CheckAuth, model.CheckAdminRole, model.CheckReadonly, html2BlockDOM)
 	ginServer.Handle("POST", "/api/lute/copyStdMarkdown", model.CheckAuth, copyStdMarkdown)
+	ginServer.Handle("POST", "/api/lute/md2html", model.CheckAuth, md2HTML)
 
 	ginServer.Handle("POST", "/api/query/sql", model.CheckAuth, model.CheckAdminRole, model.CheckReadonly, SQL)
 	ginServer.Handle("POST", "/api/sqlite/flushTransaction", model.CheckAuth, model.CheckAdminRole, model.CheckReadonly, flushTransaction)
@@ -441,6 +442,7 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("POST", "/api/repo/tagSnapshot", model.CheckAuth, model.CheckAdminRole, model.CheckReadonly, tagSnapshot)
 	ginServer.Handle("POST", "/api/repo/checkoutRepo", model.CheckAuth, model.CheckAdminRole, model.CheckReadonly, checkoutRepo)
 	ginServer.Handle("POST", "/api/repo/getRepoSnapshots", model.CheckAuth, model.CheckAdminRole, getRepoSnapshots)
+	ginServer.Handle("POST", "/api/repo/searchRepoFile", model.CheckAuth, model.CheckAdminRole, searchRepoFile)
 	ginServer.Handle("POST", "/api/repo/getRepoTagSnapshots", model.CheckAuth, model.CheckAdminRole, getRepoTagSnapshots)
 	ginServer.Handle("POST", "/api/repo/removeRepoTagSnapshot", model.CheckAuth, model.CheckAdminRole, model.CheckReadonly, removeRepoTagSnapshot)
 	ginServer.Handle("POST", "/api/repo/getCloudRepoTagSnapshots", model.CheckAuth, model.CheckAdminRole, getCloudRepoTagSnapshots)
@@ -451,6 +453,7 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.Handle("POST", "/api/repo/diffRepoSnapshots", model.CheckAuth, model.CheckAdminRole, diffRepoSnapshots)
 	ginServer.Handle("POST", "/api/repo/openRepoSnapshotFile", model.CheckAuth, model.CheckAdminRole, openRepoSnapshotFile)
 	ginServer.Handle("POST", "/api/repo/rollbackRepoSnapshotFile", model.CheckAuth, model.CheckAdminRole, rollbackRepoSnapshotFile)
+	ginServer.Handle("POST", "/api/repo/exportRepoFile", model.CheckAuth, model.CheckAdminRole, exportRepoFile)
 	ginServer.Handle("POST", "/api/repo/getRepoFile", model.CheckAuth, model.CheckAdminRole, getRepoFile)
 	ginServer.Handle("POST", "/api/repo/setRepoIndexRetentionDays", model.CheckAuth, model.CheckAdminRole, setRepoIndexRetentionDays)
 	ginServer.Handle("POST", "/api/repo/setRetentionIndexesDaily", model.CheckAuth, model.CheckAdminRole, setRetentionIndexesDaily)

@@ -703,6 +703,8 @@
   "resetRepo": "Daten-Repo zurücksetzen",
   "createSnapshot": "Snapshot erstellen",
   "dataSnapshot": "Datensnapshot",
+  "saveAs": "Speichern unter",
+  "searchFileName": "Dateiname suchen",
   "copyKey": "Schlüsselzeichenfolge kopieren",
   "importKey": "Schlüssel importieren",
   "keyPlaceholder": "Bitte fügen Sie die Schlüsselzeichenfolge hier ein",
@@ -1032,6 +1034,7 @@
   "memo": "Notiz",
   "name": "Name",
   "fold": "Falten/Erweitern",
+  "foldRecursive": "Rekursiv falten/erweitern",
   "zoom": "Zoom",
   "invalid": "Ungültig",
   "conflict": "Konflikt",
@@ -1783,6 +1786,11 @@
     "285": "Passwort ist falsch",
     "286": "[%s] wurde bereits zurückgesetzt",
     "287": "Der Zugriffsautorisierungscode darf nicht nur aus Leerzeichen bestehen. Um ihn zu deaktivieren, leeren Sie das Eingabefeld direkt",
-    "288": " (Standard)"
+    "288": " (Standard)",
+    "289": "In Downloads exportiert",
+    "290": "Export fehlgeschlagen",
+    "291": "Datei nicht gefunden oder leer",
+    "292": "Datei kann nicht erstellt werden",
+    "293": "Datei kann nicht geschrieben werden"
   }
 }

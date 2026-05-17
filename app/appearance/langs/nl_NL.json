@@ -703,6 +703,8 @@
   "resetRepo": "Data-repo resetten",
   "createSnapshot": "Momentopname maken",
   "dataSnapshot": "Gegevensmomentopname",
+  "saveAs": "Opslaan als",
+  "searchFileName": "Gegevensmomentopname",
   "copyKey": "Sleutel kopieren",
   "importKey": "Sleutel importeren",
   "keyPlaceholder": "Plak sleutel hier",
@@ -1032,6 +1034,7 @@
   "memo": "Memo",
   "name": "Naam",
   "fold": "In-/Uitklappen",
+  "foldRecursive": "Recursief in-/uitklappen",
   "zoom": "Zoomen",
   "invalid": "Ongeldig",
   "conflict": "Conflict",
@@ -1783,6 +1786,11 @@
     "285": "Wachtwoord onjuist",
     "286": "[%s] is al teruggedraaid",
     "287": "Toegangscode mag niet alleen spaties bevatten",
-    "288": " (Standaard)"
+    "288": " (Standaard)",
+    "289": "Geëxporteerd naar Downloads",
+    "290": "Export mislukt",
+    "291": "Bestand niet gevonden of leeg",
+    "292": "Kan bestand niet aanmaken",
+    "293": "Kan niet naar bestand schrijven"
   }
 }

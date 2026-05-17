@@ -54,7 +54,8 @@ import {isLocalPath} from "../../util/pathName";
 import {openBy, openFileById} from "../../editor/util";
 /// #endif
 import {alignImgCenter, alignImgLeft, commonHotkey, downSelect, getStartEndElement, upSelect} from "./commonHotkey";
-import {fileAnnotationRefMenu, inlineMathMenu, linkMenu, refMenu, setFold, tagMenu} from "../../menus/protyle";
+import {fileAnnotationRefMenu, inlineMathMenu, linkMenu, refMenu, tagMenu} from "../../menus/protyle";
+import {foldRecursiveHotkey, setFold} from "../util/blockFold";
 import {openAttr} from "../../menus/commonMenuItem";
 import {Constants} from "../../constants";
 import {fetchPost} from "../../util/fetch";
@@ -328,6 +329,13 @@ export const keydown = (protyle: IProtyle, editorElement: HTMLElement) => {
             event.stopPropagation();
             event.preventDefault();
             return false;
+        }
+
+        if (matchHotKey(window.siyuan.config.keymap.editor.general.foldRecursive.custom, event) && !event.repeat) {
+            foldRecursiveHotkey(protyle, nodeElement);
+            event.stopPropagation();
+            event.preventDefault();
+            return;
         }
 
         if (matchHotKey(window.siyuan.config.keymap.editor.general.expand.custom, event) && !event.repeat) {

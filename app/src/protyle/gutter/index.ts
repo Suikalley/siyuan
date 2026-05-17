@@ -7,7 +7,8 @@ import {
     isInEmbedBlock
 } from "../util/hasClosest";
 import {getIconByType} from "../../editor/getIcon";
-import {enterBack, iframeMenu, setFold, tableMenu, videoMenu, zoomOut} from "../../menus/protyle";
+import {enterBack, iframeMenu, tableMenu, videoMenu, zoomOut} from "../../menus/protyle";
+import {foldBlocksRecursively, setFold} from "../util/blockFold";
 import {MenuItem} from "../../menus/Menu";
 import {copySubMenu, openAttr, openFileAttr, openWechatNotify} from "../../menus/commonMenuItem";
 import {
@@ -16,7 +17,6 @@ import {
     isInHarmony,
     isMac,
     isOnlyMeta,
-    openByMobile,
     saveExportFile,
     updateHotkeyAfterTip,
     updateHotkeyTip,
@@ -76,10 +76,12 @@ export class Gutter {
         if (isMac()) {
             this.gutterTip = window.siyuan.languages.gutterTip.replace("⌥→", updateHotkeyAfterTip(window.siyuan.config.keymap.general.enter.custom, "/"))
                 .replace("⌘↑", updateHotkeyAfterTip(window.siyuan.config.keymap.editor.general.collapse.custom, "/"))
+                .replace("⌥⌘↑", updateHotkeyAfterTip(window.siyuan.config.keymap.editor.general.foldRecursive.custom, "/"))
                 .replace("⌥⌘A", updateHotkeyAfterTip(window.siyuan.config.keymap.editor.general.attr.custom, "/"));
         } else {
             this.gutterTip = window.siyuan.languages.gutterTip.replace("⌥→", updateHotkeyAfterTip(window.siyuan.config.keymap.general.enter.custom, "/"))
                 .replace("⌘↑", updateHotkeyAfterTip(window.siyuan.config.keymap.editor.general.collapse.custom, "/"))
+                .replace("⌥⌘↑", updateHotkeyAfterTip(window.siyuan.config.keymap.editor.general.foldRecursive.custom, "/"))
                 .replace("⌥⌘A", updateHotkeyAfterTip(window.siyuan.config.keymap.editor.general.attr.custom, "/"))
                 .replace(/⌘/g, "Ctrl+").replace(/⌥/g, "Alt+").replace(/⇧/g, "Shift+").replace(/⌃/g, "Ctrl+");
         }
@@ -1582,7 +1584,7 @@ export class Gutter {
                         const msgId = showMessage(window.siyuan.languages.exporting, -1);
                         fetchPost("/api/export/exportCodeBlock", {id}, (response) => {
                             hideMessage(msgId);
-                            openByMobile(response.data.path);
+                            saveExportFile(response.data.path);
                         });
                     }
                 }]
@@ -2042,6 +2044,16 @@ export class Gutter {
                 accelerator: `${updateHotkeyTip(window.siyuan.config.keymap.editor.general.collapse.custom)}/${updateHotkeyTip("⌥" + window.siyuan.languages.click)}`,
                 click() {
                     setFold(protyle, nodeElement);
+                    focusBlock(nodeElement);
+                }
+            }).element);
+            window.siyuan.menus.menu.append(new MenuItem({
+                id: "foldRecursive",
+                icon: "iconFoldUnFold",
+                label: window.siyuan.languages.foldRecursive || "Fold/Expand recursively",
+                accelerator: window.siyuan.config.keymap.editor.general.foldRecursive?.custom,
+                click() {
+                    foldBlocksRecursively(protyle, [nodeElement]);
                     focusBlock(nodeElement);
                 }
             }).element);

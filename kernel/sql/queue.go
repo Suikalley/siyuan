@@ -27,6 +27,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/88250/lute"
 	"github.com/88250/lute/parse"
 	"github.com/siyuan-note/eventbus"
 	"github.com/siyuan-note/logging"
@@ -39,7 +40,6 @@ var (
 	operationQueue []*dbQueueOperation
 	dbQueueLock    = sync.Mutex{}
 	dbQueueCond    = sync.NewCond(&dbQueueLock)
-	txLock         = sync.Mutex{}
 )
 
 type dbQueueOperation struct {
@@ -96,7 +96,7 @@ func ClearQueue() {
 	dbQueueLock.Lock()
 	defer dbQueueLock.Unlock()
 	operationQueue = nil
-	clearWALEntries()
+	clearIndexQueueEntries()
 }
 
 var flushingTx = atomic.Bool{}
@@ -105,17 +105,16 @@ func FlushQueue() {
 	initDatabaseLock.Lock()
 	defer initDatabaseLock.Unlock()
 
-	ops, walSnapshot := getOperations()
+	ops, indexSnapshot := getOperations()
 	total := len(ops)
 	if 1 > total && !flushingTx.Load() {
+		processDiskQueue()
 		return
 	}
 
-	txLock.Lock()
 	flushingTx.Store(true)
 	defer func() {
 		flushingTx.Store(false)
-		txLock.Unlock()
 		// 通知等待的协程队列已刷新完成
 		dbQueueCond.Broadcast()
 	}()
@@ -204,7 +203,8 @@ func FlushQueue() {
 
 	eventbus.Publish(eventbus.EvtSQLIndexFlushed)
 
-	clearWAL(walSnapshot)
+	clearIndexQueue(indexSnapshot)
+	processDiskQueue()
 }
 
 func execOp(op *dbQueueOperation, tx *sql.Tx, context map[string]any) (err error) {
@@ -450,18 +450,52 @@ func RemoveTreePathQueue(treeBox, treePathPrefix string) {
 	appendOperation(newOp)
 }
 
-func getOperations() (ops []*dbQueueOperation, walSnapshot int64) {
+func getOperations() (ops []*dbQueueOperation, indexSnapshot int64) {
 	dbQueueLock.Lock()
 	defer dbQueueLock.Unlock()
 
 	ops = operationQueue
 	operationQueue = nil
-	walSnapshot = walSize.Load()
+	indexSnapshot = indexQueueSize.Load()
 	return
 }
 
 func appendOperation(op *dbQueueOperation) {
 	operationQueue = append(operationQueue, op)
-	appendToWAL(op)
+	appendToIndexQueue(op)
 	eventbus.Publish(eventbus.EvtSQLIndexChanged)
+}
+
+func processDiskQueue() {
+	entries := loadIndexQueue()
+	if 1 > len(entries) {
+		return
+	}
+
+	logging.LogInfof("flushing [%d] disk index queue operations", len(entries))
+
+	luteEngine := lute.New()
+	context := map[string]any{eventbus.CtxPushMsg: eventbus.CtxPushMsgToStatusBar}
+	for _, e := range entries {
+		op := indexEntryToOp(e, luteEngine, "flush disk queue")
+		if nil == op {
+			continue
+		}
+		tx, err := beginTx()
+		if err != nil {
+			return
+		}
+		if err = execOp(op, tx, context); err != nil {
+			tx.Rollback()
+			closeTxPreparedStmts(tx)
+			logging.LogErrorf("queue operation [%s] failed: %s", op.action, err)
+			continue
+		}
+		if err = commitTx(tx); err != nil {
+			logging.LogErrorf("commit tx failed: %s", err)
+			continue
+		}
+	}
+
+	clearIndexQueueEntries()
 }

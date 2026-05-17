@@ -116,17 +116,17 @@ export class Dock {
                 moveItem.style.background = "var(--b3-theme-primary-light)";
                 moveItem.innerHTML = "<svg></svg>";
                 moveItem.id = "dockMoveItem";
-                document.querySelectorAll(".dock__split").forEach((splitItem: HTMLElement) => {
-                    splitItem.style.setProperty("display", "block", "important");
-                });
                 documentSelf.onmousemove = (moveEvent: MouseEvent) => {
                     if (window.siyuan.config.readonly ||
-                        Math.abs(moveEvent.clientY - event.clientY) < 3 && Math.abs(moveEvent.clientX - event.clientX) < 3) {
+                        Math.abs(moveEvent.clientY - event.clientY) < 5 && Math.abs(moveEvent.clientX - event.clientX) < 5) {
                         return;
                     }
                     moveEvent.preventDefault();
                     moveEvent.stopPropagation();
                     if (!ghostElement) {
+                        document.querySelectorAll(".dock__split").forEach((splitItem: HTMLElement) => {
+                            splitItem.style.setProperty("display", "block", "important");
+                        });
                         item.style.opacity = "0.38";
                         ghostElement = item.cloneNode(true) as HTMLElement;
                         ghostElement.setAttribute("data-ghost-type", "dock");
@@ -746,7 +746,7 @@ export class Dock {
         // 目标处理
         sourceElement.setAttribute("data-index", index.toString());
         if (previousType) {
-            this.elements[0].parentElement.querySelector(`[data-type="${previousType}"]`).after(sourceElement);
+            this.elements[index].parentElement.querySelector(`[data-type="${previousType}"]`).after(sourceElement);
         } else {
             this.elements[index].insertAdjacentElement("afterbegin", sourceElement);
         }
